@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Stem — Save to your stems",
+  "name": "Stem — Save, curate, and share your finds",
   "version": "1.0.0",
-  "description": "Save any page to your Stem collections. Curate what you're learning.",
+  "description": "For the curious. Save pages to themed collections, discover what others are exploring, and go deep on what interests you.",
   "permissions": ["activeTab"],
   "optional_permissions": ["bookmarks"],
   "host_permissions": ["https://stem.md/*"],

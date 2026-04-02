@@ -1,10 +1,12 @@
 # Stem for Chrome
 
-Save any page to your [Stem](https://stem.md) collections, right from your browser.
+Save, curate, and share your finds. The Chrome extension for [Stem](https://stem.md).
+
+For the curious. Save pages to themed collections, discover what others are exploring, and go deep on what interests you.
 
 ## What it does
 
-- Click the extension icon on any page to save it as a find to one of your stems
+- Save any page to one of your stems with a single click
 - Automatically extracts the page title, description, image, and favicon
 - Add a note about why the page is interesting before saving
 - Works with your existing Stem account (no separate login)
