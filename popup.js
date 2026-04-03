@@ -1,4 +1,4 @@
-const STEM_BASE = "https://stem.md";
+const API_BASE = "https://api.stem.md";
 
 let pageData = null;
 let stems = [];
@@ -10,7 +10,7 @@ async function init() {
 
   // Check auth
   try {
-    const res = await fetch(`${STEM_BASE}/api/notifications/count`, {
+    const res = await fetch(`${API_BASE}/notifications/count`, {
       credentials: "include",
     });
     if (!res.ok) throw new Error("Not authed");
@@ -29,7 +29,7 @@ async function init() {
 
     // Fetch user's stems
     try {
-      const res = await fetch(`${STEM_BASE}/api/stems/mine`, {
+      const res = await fetch(`${API_BASE}/stems`, {
         credentials: "include",
       });
       if (res.ok) {
@@ -37,9 +37,7 @@ async function init() {
         stems = json.stems || [];
         populateStems();
       }
-    } catch {
-      // If /api/stems/mine doesn't exist yet, user can still type
-    }
+    } catch {}
 
     loading.style.display = "none";
     saveScreen.style.display = "block";
@@ -51,9 +49,8 @@ function populateStems() {
   const select = document.getElementById("stem-select");
   stems.forEach((stem) => {
     const opt = document.createElement("option");
-    opt.value = `${stem.username}/${stem.slug}`;
+    opt.value = stem.id;
     opt.textContent = `${stem.emoji || ""} ${stem.title}`.trim();
-    opt.dataset.stemId = stem.id;
     select.appendChild(opt);
   });
 }
@@ -78,36 +75,30 @@ document.getElementById("save-btn")?.addEventListener("click", async () => {
   btn.textContent = "Saving...";
   status.style.display = "none";
 
-  const selectedOption = select.options[select.selectedIndex];
-  const stemPath = select.value;
+  const stemId = select.value;
 
   try {
-    // Build form data matching the add_find action
-    const formData = new FormData();
-    formData.append("intent", "add_find");
-    formData.append("url", pageData.url);
-    if (note) formData.append("note", note);
-    if (pageData.title) formData.append("og_title", pageData.title);
-    if (pageData.description) formData.append("og_description", pageData.description);
-    if (pageData.image) formData.append("og_image", pageData.image);
-    if (pageData.favicon) formData.append("og_favicon", pageData.favicon);
+    const body = {
+      url: pageData.url,
+      title: pageData.title || undefined,
+      description: pageData.description || undefined,
+      image_url: pageData.image || undefined,
+      favicon_url: pageData.favicon || undefined,
+      note: note || undefined,
+    };
 
-    const domain = new URL(pageData.url).hostname.replace("www.", "");
-    formData.append("og_domain", domain);
-
-    const res = await fetch(`${STEM_BASE}/${stemPath}`, {
+    const res = await fetch(`${API_BASE}/stems/${stemId}/finds`, {
       method: "POST",
       credentials: "include",
-      body: formData,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
 
-    if (res.ok || res.status === 302) {
+    if (res.ok) {
       status.className = "status success";
       status.textContent = "Saved!";
       status.style.display = "block";
       btn.textContent = "Saved";
-
-      // Auto-close after 1.5s
       setTimeout(() => window.close(), 1500);
     } else {
       const data = await res.json().catch(() => ({}));

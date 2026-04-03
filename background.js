@@ -1,12 +1,12 @@
 // Background service worker for Stem extension.
 // Handles auth state and communication between content script and popup.
 
-const STEM_BASE = "https://stem.md";
+const API_BASE = "https://api.stem.md";
 
 // Check if user is logged in by fetching the session
 async function checkAuth() {
   try {
-    const res = await fetch(`${STEM_BASE}/api/notifications/count`, {
+    const res = await fetch(`${API_BASE}/notifications/count`, {
       credentials: "include",
     });
     if (!res.ok) return null;
