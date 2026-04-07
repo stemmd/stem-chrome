@@ -5,7 +5,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      width: 320px;
+      width: 360px;
       min-height: 200px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 14px;
@@ -26,6 +26,29 @@
       font-weight: normal;
     }
     .content { padding: 16px; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #DDD8CF;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 0;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: #9C9890;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .tab.active {
+      color: #2D5A3D;
+      border-bottom-color: #2D5A3D;
+    }
 
     /* Auth screen */
     .auth-msg {
@@ -67,7 +90,7 @@
       white-space: nowrap;
     }
 
-    /* Stem selector */
+    /* Form elements */
     .label {
       font-size: 12px;
       font-weight: 600;
@@ -75,10 +98,7 @@
       margin-bottom: 6px;
       display: block;
     }
-    .select-wrap {
-      position: relative;
-      margin-bottom: 12px;
-    }
+    .select-wrap { position: relative; margin-bottom: 12px; }
     select {
       width: 100%;
       padding: 8px 12px;
@@ -92,8 +112,6 @@
       cursor: pointer;
       appearance: none;
     }
-
-    /* Note */
     textarea {
       width: 100%;
       padding: 8px 12px;
@@ -109,8 +127,8 @@
       margin-bottom: 12px;
     }
 
-    /* Save button */
-    .save-btn {
+    /* Buttons */
+    .save-btn, .import-btn {
       width: 100%;
       padding: 10px;
       background: #2D5A3D;
@@ -122,11 +140,11 @@
       font-family: inherit;
       cursor: pointer;
     }
-    .save-btn:disabled {
+    .save-btn:disabled, .import-btn:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
-    .save-btn:hover:not(:disabled) {
+    .save-btn:hover:not(:disabled), .import-btn:hover:not(:disabled) {
       background: #4A7A5C;
     }
 
@@ -147,6 +165,88 @@
       color: #9C9890;
       font-size: 13px;
     }
+
+    /* Bookmark import */
+    .bookmark-tree {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+      border: 1.5px solid #DDD8CF;
+      border-radius: 6px;
+      background: #EDE9E2;
+    }
+    .bm-folder {
+      padding: 0;
+    }
+    .bm-folder-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1C1A17;
+      cursor: pointer;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .bm-folder-header:hover { background: rgba(0,0,0,0.03); }
+    .bm-chevron { font-size: 10px; color: #9C9890; width: 12px; }
+    .bm-children { padding-left: 16px; }
+    .bm-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: #5C5850;
+    }
+    .bm-item input[type="checkbox"] { accent-color: #2D5A3D; flex-shrink: 0; }
+    .bm-item-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 1;
+      min-width: 0;
+    }
+    .bm-count {
+      font-size: 12px;
+      color: #9C9890;
+      margin-bottom: 8px;
+    }
+    .bm-select-all {
+      font-size: 12px;
+      color: #2D5A3D;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 8px;
+      text-decoration: underline;
+      font-family: inherit;
+    }
+    .bm-progress {
+      font-size: 12px;
+      color: #5C5850;
+      margin-top: 8px;
+    }
+    .bm-bar {
+      height: 3px;
+      background: #DDD8CF;
+      border-radius: 2px;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .bm-bar-fill {
+      height: 100%;
+      background: #2D5A3D;
+      border-radius: 2px;
+      transition: width 0.2s;
+    }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
@@ -170,22 +270,56 @@
     </div>
   </div>
 
-  <div id="save-screen" class="content" style="display:none">
-    <div class="page-title" id="page-title"></div>
-    <div class="page-url" id="page-url"></div>
-
-    <span class="label">Save to stem</span>
-    <div class="select-wrap">
-      <select id="stem-select">
-        <option value="">Select a stem...</option>
-      </select>
+  <div id="main-screen" style="display:none">
+    <div class="tabs">
+      <button class="tab active" id="tab-save">Save Page</button>
+      <button class="tab" id="tab-import">Import Bookmarks</button>
     </div>
 
-    <span class="label">Note (optional)</span>
-    <textarea id="note" placeholder="Why is this interesting?"></textarea>
+    <!-- Save page tab -->
+    <div id="panel-save" class="content">
+      <div class="page-title" id="page-title"></div>
+      <div class="page-url" id="page-url"></div>
 
-    <button class="save-btn" id="save-btn" disabled>Save find</button>
-    <div id="status" class="status" style="display:none"></div>
+      <span class="label">Save to stem</span>
+      <div class="select-wrap">
+        <select id="stem-select">
+          <option value="">Select a stem...</option>
+        </select>
+      </div>
+
+      <span class="label">Note (optional)</span>
+      <textarea id="note" placeholder="Why is this interesting?"></textarea>
+
+      <button class="save-btn" id="save-btn" disabled>Save artifact</button>
+      <div id="status" class="status" style="display:none"></div>
+    </div>
+
+    <!-- Import bookmarks tab -->
+    <div id="panel-import" class="content hidden">
+      <span class="label">Import to stem</span>
+      <div class="select-wrap">
+        <select id="import-stem-select">
+          <option value="">Select a stem...</option>
+        </select>
+      </div>
+
+      <div id="bm-loading" class="loading" style="padding: 20px 0;">Loading bookmarks...</div>
+
+      <div id="bm-container" style="display:none">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <span class="bm-count"><span id="bm-selected-count">0</span> selected</span>
+          <button class="bm-select-all" id="bm-select-all">Select all</button>
+        </div>
+        <div class="bookmark-tree" id="bm-tree"></div>
+        <button class="import-btn" id="import-btn" disabled>Import selected</button>
+        <div id="import-progress" class="bm-progress" style="display:none">
+          <span id="import-progress-text"></span>
+          <div class="bm-bar"><div class="bm-bar-fill" id="import-bar" style="width:0"></div></div>
+        </div>
+        <div id="import-status" class="status" style="display:none"></div>
+      </div>
+    </div>
   </div>
 
   <script src="popup.js"></script>

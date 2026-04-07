@@ -1,6 +1,6 @@
 # Stem for Chrome
 
-Save, curate, and share your finds. The Chrome extension for [Stem](https://stem.md).
+Save, curate, and share your artifacts. The Chrome extension for [Stem](https://stem.md).
 
 For the curious. Save pages to themed collections, discover what others are exploring, and go deep on what interests you.
 
@@ -9,6 +9,7 @@ For the curious. Save pages to themed collections, discover what others are expl
 - Save any page to one of your stems with a single click
 - Automatically extracts the page title, description, image, and favicon
 - Add a note about why the page is interesting before saving
+- Import bookmarks from Chrome into any stem (bulk import with progress)
 - Works with your existing Stem account (no separate login)
 
 ## Install
@@ -29,7 +30,7 @@ When you click the Stem icon, the extension:
 1. Reads the current page's Open Graph metadata (title, description, image)
 2. Fetches your stems from your Stem account
 3. Lets you pick a stem and add an optional note
-4. Saves the find via the Stem API
+4. Saves the artifact via the Stem API
 
 All data extraction happens locally in your browser. Only the page URL and metadata you choose to save are sent to Stem.
 
@@ -38,8 +39,9 @@ All data extraction happens locally in your browser. Only the page URL and metad
 | Permission | Why |
 |---|---|
 | `activeTab` | Read the current page's title and URL when you click Save |
-| `stem.md` host | Authenticate with your account and save finds |
-| `bookmarks` (optional) | Only requested if you use the bookmark import feature |
+| `stem.md` host | Authenticate with your account and save artifacts |
+| `bookmarks` (optional) | Only requested when you use the Import Bookmarks feature |
+
 
 ## Privacy
 
